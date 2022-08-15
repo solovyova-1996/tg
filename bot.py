@@ -4,14 +4,20 @@ from os import getenv
 from aiogram.dispatcher.filters import Text
 from aiogram.types import CallbackQuery,ReplyKeyboardMarkup
 from aiogram_calendar import simple_cal_callback, SimpleCalendar, dialog_cal_callback, DialogCalendar
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+storage = MemoryStorage()
 # бот
 bot_token = getenv("BOT_TOKEN")
 if not bot_token:
     exit("Ошибка, нет токена")
 bot = Bot(token=bot_token)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot,storage=storage)
 logging.basicConfig(level=logging.INFO)
-
+class CreateRequest(StatesGroup):
+    start_state = State()
+    choice_date_state = State ()
 @dp.message_handler(commands='test')
 async def cmd_test(message:types.Message):
     await message.reply("Test")
@@ -42,14 +48,32 @@ async def cmd_start(message:types.Message):
     keyboard.row(*buttons_1)
     name = message.from_user.first_name
     await message.answer(f"Здравствуйте {name}!Вaс приветствует бот-развоз.Вы в главном меню",reply_markup=keyboard)
+    # await CreateRequest.start_state.set()
 
+async def choice_menu(message:types.Message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons=["Создать заявку","Мои заявки"]
+    buttons_1=["Оценить пользователя","Отмена"]
+    button_create_profile = types.KeyboardButton(text="Создать/редактировать профиль")
+    keyboard.row(*buttons)
+    keyboard.add(button_create_profile)
+    keyboard.row(*buttons_1)
+    name = message.from_user.first_name
+    await message.answer(f"Здравствуйте {name}!Вaс приветствует бот-развоз.Вы в главном меню",reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals=['Создать заявку'], ignore_case=True))
 async def choice_date(message:types.Message):
     await message.answer("Выерите дату: ", reply_markup=await SimpleCalendar().start_calendar())
+    # await CreateRequest.choice_date_state.set()
 
-
+# @dp.message_handler(Text(equals=['Создать заявку'], ignore_case=True))
+# async def choice_date(message:types.Message,state:FSMContext):
+    # if message.text.lower() != "назад":
+    #     await message.answer(f"Здравствуйте {name}!Вaс приветствует бот-развоз.Вы в главном меню",reply_markup=keyboard)
+    #     return
+    await message.answer("Выерите дату: ", reply_markup=await SimpleCalendar().start_calendar())
+    # await CreateRequest.choice_date_state.set()
 @dp.callback_query_handler(simple_cal_callback.filter())
 async def process_simple_calendar(callback_query: CallbackQuery, callback_data: dict):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)

@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 
 # создание БД,показ логов включен
-engine = create_engine('sqlite:///tg_dh2.db', echo=True)
+engine = create_engine('sqlite:///tg_а2.db', echo=True)
 metadata = MetaData()
 # создание таблиц
 users = Table('users', metadata, Column('id', Integer(), primary_key=True),
@@ -16,12 +16,11 @@ users = Table('users', metadata, Column('id', Integer(), primary_key=True),
 
 requests = Table('requests', metadata,
                  Column('id', Integer(), primary_key=True),
-                 Column('driver', Integer(), ForeignKey('users.id'),
-                        nullable=False), Column('terms_delivery', String(50)),
-                 Column('datetime', String(), nullable=False),
-                 Column('place_departure', String(50), nullable=False),
-                 Column('place_comming', String(50), nullable=False),
-                 Column('number_of_seats', Integer(), nullable=False))
+                 Column('driver', Integer(), ForeignKey('users.id')), Column('terms_delivery', String(50)),
+                 Column('datetime', String()),
+                 Column('place_departure', String(50)),
+                 Column('place_comming', String(50)),
+                 Column('number_of_seats', Integer()))
 
 # создание всех таблиц
 metadata.create_all(engine)
