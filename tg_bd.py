@@ -10,8 +10,10 @@ metadata = MetaData()
 users = Table('users', metadata, Column('id', Integer(), primary_key=True),
               Column('tg_nik', String(50), unique=True),
               Column('tg_id', String(50), nullable=False, unique=True),
-              Column('first_name', String(50)), Column('last_name', String(50)),
-              Column('car_brend', String(50)), Column('car_model', String(50)),
+              Column('first_name', String(50)),
+              Column('last_name', String(50)),
+              Column('car_brend', String(50)),
+              Column('car_model', String(50)),
               Column('car_number', String(50)),
               Column('phone_number', String(15)))
 
